@@ -13,23 +13,12 @@ uint8_t ICM20948::whoami(){
 	return adress;
 }
 
-uint8_t ICM20948::pwrmgmt1(uint8_t data){
+void ICM20948::pwrmgmt1(uint8_t data){
 	 memWrite(REGISTER.PWR_MGMT_1, &data);
-	 return 0;
 }
 
-uint8_t ICM20948::pwrmgmt2(uint8_t data){
+void ICM20948::pwrmgmt2(uint8_t data){
 	 memWrite(REGISTER.PWR_MGMT_2, &data);
-	 return 0;
-}
-
-void ICM20948::reset(){
-	pwrmgmt1(BIT_H_RESET);
-	HAL_Delay(100);
-	pwrmgmt1(BTT_CLK_PLL);
-	HAL_Delay(100);
-	uint8_t buffer=BIT_INT_ACTL | BIT_INT_OPEN;
-	memWrite(REGISTER.INT_PIN_CFG, &buffer);
 }
 
 bool ICM20948::changeUserBank(const uint8_t bank){

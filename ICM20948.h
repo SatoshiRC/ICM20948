@@ -52,21 +52,20 @@ public:
 
 
 	uint8_t whoami();
+	float getAccel(uint8_t axis);
+	float getGyro(uint8_t axis);
+	void getAccelBurst(std::array<float,3> &value);
+	void getGyroBurst(std::array<float,3> &value);
+	void get6ValueBurst(std::array<float,3> &accel, std::array<float,3> &gyro);
 
-	uint8_t pwrmgmt1(uint8_t data);
-	uint8_t pwrmgmt2(uint8_t data);
+	void pwrmgmt1(uint8_t data);
+	void pwrmgmt2(uint8_t data);
 	void reset();
 	bool changeUserBank(const uint8_t bank);
 	bool accelConfig(const AccelSensitivity fssel,const bool enableDLPF,const uint8_t configDLPF);
 	bool gyroConfig(const GyroSensitivity fssel,const bool enableDLPF,const uint8_t configDLPF);
 	void intPinConfig(uint8_t value);
 	void intenable(uint8_t value=1);
-
-	float getAccel(uint8_t axis);
-	float getGyro(uint8_t axis);
-	void getAccelBurst(std::array<float,3> &value);
-	void getGyroBurst(std::array<float,3> &value);
-	void get6ValueBurst(std::array<float,3> &accel, std::array<float,3> &gyro);
 
 	const uint8_t DISABLE_SENSORS=0x3F;
 	const uint8_t ENABLE_SENSORS=0x00;
