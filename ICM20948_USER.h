@@ -10,7 +10,7 @@
 
 #include "ICM20948.h"
 #include "ICM20948_HAL.h"
-#include "Madgwick/Madgwick.h"
+//#include "Madgwick/Madgwick.h"
 
 class ICM20948_USER{
 public:
