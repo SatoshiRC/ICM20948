@@ -17,10 +17,8 @@ public:
 private:
 	 I2C_HandleTypeDef *hi2c;
 
-	void memWrite(uint8_t memAddress, uint8_t *pData);
-	void memRead(uint8_t memAddress, uint8_t *pData);
-	void memWrite(uint8_t memAddress, uint8_t *pData, uint8_t length);
-	void memRead(uint8_t memAddress, uint8_t *pData, uint8_t length);
+	void memWrite(uint8_t memAddress, uint8_t *pData, uint8_t length=1);
+	void memRead(uint8_t memAddress, uint8_t *pData, uint8_t length=1);
 };
 
 #endif /* ICM20948_ICM20948_HAL_H_ */

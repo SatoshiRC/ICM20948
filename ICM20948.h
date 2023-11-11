@@ -82,10 +82,8 @@ protected:
 	const float GYRO_SENSITIVITY[4]={131,65.5,32.8,16.4};
 
 private:
-	virtual void memWrite(uint8_t memAddress, uint8_t *pData){}
-	virtual void memRead(uint8_t memAddress, uint8_t *pData){}
-	virtual void memWrite(uint8_t memAddress, uint8_t *pData, uint8_t length){}
-	virtual void memRead(uint8_t memAddress, uint8_t *pData, uint8_t length){}
+	virtual void memWrite(uint8_t memAddress, uint8_t *pData, uint8_t length=1){}
+	virtual void memRead(uint8_t memAddress, uint8_t *pData, uint8_t length=1){}
 };
 
 #endif /* INC_ICM20948_H_ */
