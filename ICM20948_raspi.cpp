@@ -69,4 +69,8 @@ void ICM20948_raspi::__memRead(uint8_t memAddress, uint8_t *pData, uint8_t lengt
 	read(i2c_fd, pData, length);
 }
 
+void ICM20948_raspi::__delay(uint32_t ms){
+	usleep(ms * 1000);
+}
+
 #endif /* __linux__ */

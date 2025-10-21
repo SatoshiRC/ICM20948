@@ -7,13 +7,6 @@
 
 #include "ICM20948.h"
 
-#ifdef USE_HAL_DRIVER
-#include "main.h"
-#elif defined(__linux__)
-#include <unistd.h>
-#define HAL_Delay(x) usleep((x) * 1000)
-#endif
-
 uint8_t ICM20948::whoami(){
 	uint8_t adress=0;
 	memRead(REGISTER::BANK0::WHO_AM_I, &adress);
@@ -31,7 +24,7 @@ void ICM20948::pwrmgmt2(uint8_t data){
 void ICM20948::reset(){
 	uint8_t n=0b1<<7;
 	memWrite(REGISTER::BANK0::PWR_MGMT_1, &n);
-	HAL_Delay(10);
+	__delay(10);
 }
 
 bool ICM20948::changeUserBank(REGISTER::BANK bank){
