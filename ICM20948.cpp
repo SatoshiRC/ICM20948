@@ -7,6 +7,13 @@
 
 #include "ICM20948.h"
 
+#ifdef USE_HAL_DRIVER
+#include "main.h"
+#elif defined(__linux__)
+#include <unistd.h>
+#define HAL_Delay(x) usleep((x) * 1000)
+#endif
+
 uint8_t ICM20948::whoami(){
 	uint8_t adress=0;
 	memRead(REGISTER::BANK0::WHO_AM_I, &adress);

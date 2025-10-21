@@ -8,7 +8,7 @@
 #ifndef INC_ICM20948_H_
 #define INC_ICM20948_H_
 
-#include"i2c.h"
+#include <stdint.h>
 #include <array>
 
 class ICM20948 {
