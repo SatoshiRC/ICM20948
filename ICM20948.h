@@ -143,8 +143,8 @@ public:
 	void readIMU_DMA();
 
 	//return the raw values array
-//	std::array<int16_t, 3> getRawAccel(){return rawAccel;}
-//	std::array<int16_t, 3> getRawGyro(){return rawGyro;}
+	std::array<int16_t, 3> getRawAccel() const { return { raw[0], raw[1], raw[2] }; }
+	std::array<int16_t, 3> getRawGyro()  const { return { raw[3], raw[4], raw[5] }; }
 
 	//calculate acceles and angular or one of them velosity from raw values array and return the result.
 	float getAccel(AXSIS axsis);
