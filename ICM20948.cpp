@@ -172,3 +172,104 @@ float ICM20948::calculateAccel(const int16_t raw){
 float ICM20948::calculateGyro(const int16_t raw){
 	return raw / GYRO_SENSITIVITY[(uint8_t)_gyrosensitivity];
 }
+
+float ICM20948::calculateMag(const int16_t raw){
+	return raw * MAG_SENSITIVITY;
+}
+
+void ICM20948::writeMagRegister(uint8_t reg, uint8_t value){
+	// Use I2C slave 4 for single register writes
+	memWrite(REGISTER::BANK3::I2C_SLV4_ADDR, AK09916::I2C_ADDR); // Write mode
+	memWrite(REGISTER::BANK3::I2C_SLV4_REG, reg);
+	memWrite(REGISTER::BANK3::I2C_SLV4_DO, value);
+	memWrite(REGISTER::BANK3::I2C_SLV4_CTRL, 0x80); // Enable I2C_SLV4 transaction
+	__delay(1);
+}
+
+uint8_t ICM20948::readMagRegister(uint8_t reg){
+	// Use I2C slave 4 for single register reads
+	memWrite(REGISTER::BANK3::I2C_SLV4_ADDR, AK09916::I2C_ADDR | 0x80); // Read mode
+	memWrite(REGISTER::BANK3::I2C_SLV4_REG, reg);
+	memWrite(REGISTER::BANK3::I2C_SLV4_CTRL, 0x80); // Enable I2C_SLV4 transaction
+	__delay(1);
+	
+	uint8_t data;
+	memRead(REGISTER::BANK3::I2C_SLV4_DI, &data);
+	return data;
+}
+
+bool ICM20948::initMagnetometer(){
+	// Enable I2C master mode
+	uint8_t userCtrl;
+	memRead(REGISTER::BANK0::USER_CTRL, &userCtrl);
+	userCtrl |= 0x20; // I2C_MST_EN
+	memWrite(REGISTER::BANK0::USER_CTRL, userCtrl);
+	
+	// Configure I2C master clock to 400 kHz
+	// I2C_MST_CLK = 400 kHz requires I2C_MST_CTRL = 7 (400 kHz)
+	memWrite(REGISTER::BANK3::I2C_MST_CTRL, 0x07);
+	__delay(1);
+	
+	// Reset magnetometer
+	writeMagRegister((uint8_t)AK09916::REG::CNTL3, AK09916::CNTL3_RESET);
+	__delay(10);
+	
+	// Check WHO_AM_I register
+	uint8_t whoami = readMagRegister((uint8_t)AK09916::REG::WIA2);
+	if(whoami != AK09916::WIA2_VALUE){
+		return false;
+	}
+	
+	// Set magnetometer to continuous measurement mode 100Hz
+	writeMagRegister((uint8_t)AK09916::REG::CNTL2, AK09916::CNTL2_CONT_MODE_100HZ);
+	__delay(10);
+	
+	// Configure I2C Slave 0 to read magnetometer data automatically
+	// Set slave 0 address to AK09916 in read mode
+	memWrite(REGISTER::BANK3::I2C_SLV0_ADDR, AK09916::I2C_ADDR | 0x80);
+	// Start reading from ST1 register
+	memWrite(REGISTER::BANK3::I2C_SLV0_REG, (uint8_t)AK09916::REG::ST1);
+	// Read 9 bytes (ST1, HXL, HXH, HYL, HYH, HZL, HZH, dummy, ST2)
+	memWrite(REGISTER::BANK3::I2C_SLV0_CTRL, 0x80 | 9); // Enable + 9 bytes
+	
+	return true;
+}
+
+void ICM20948::readMagnetometer(){
+	// Read magnetometer data from EXT_SLV_SENS_DATA registers
+	uint8_t magData[9];
+	memRead(REGISTER::BANK0::EXT_SLV_SENS_DATA_00, magData, 9);
+	
+	// ST1 is at magData[0], data starts at magData[1]
+	// Check if data is ready (ST1 bit 0)
+	if(magData[0] & 0x01){
+		// Check if data is not overrun (ST2 bit 3) 
+		if(!(magData[8] & 0x08)){
+			// Convert bytes to int16_t (little endian)
+			rawMag[0] = (int16_t)((magData[2] << 8) | magData[1]); // X
+			rawMag[1] = (int16_t)((magData[4] << 8) | magData[3]); // Y
+			rawMag[2] = (int16_t)((magData[6] << 8) | magData[5]); // Z
+			requireCalcMag = true;
+		}
+	}
+}
+
+void ICM20948::getMagnetometer(std::array<float,3> &value){
+	if(requireCalcMag){
+		for(uint8_t n=0; n<3; n++){
+			mag[n] = calculateMag(rawMag[n]);
+		}
+		requireCalcMag = false;
+	}
+	value = mag;
+}
+
+float ICM20948::getMagnetometer(AXSIS axsis){
+	if(requireCalcMag){
+		for(uint8_t n=0; n<3; n++){
+			mag[n] = calculateMag(rawMag[n]);
+		}
+		requireCalcMag = false;
+	}
+	return mag[(uint8_t)axsis];
+}

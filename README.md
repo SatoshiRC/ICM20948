@@ -51,11 +51,19 @@ A C++ library for the ICM-20948 9-axis motion tracking device (accelerometer, gy
    imu.accelConfig(ICM20948::AccelSensitivity::SENS_2G, true, 0);
    imu.gyroConfig(ICM20948::GyroSensitivity::SENS_250, true, 0);
    
+   // Initialize magnetometer (optional sensor)
+   if (!imu.initMagnetometer()) {
+       std::cerr << "Failed to initialize magnetometer" << std::endl;
+       return 1;
+   }
+   
    // Read data
    imu.readIMU();
-   std::array<float, 3> accel, gyro;
+   imu.readMagnetometer();
+   std::array<float, 3> accel, gyro, mag;
    imu.getAccel(accel);
    imu.getGyro(gyro);
+   imu.getMagnetometer(mag);
    
    // Clean up
    imu.end();
@@ -92,6 +100,15 @@ A C++ library for the ICM-20948 9-axis motion tracking device (accelerometer, gy
 
 ## API Reference
 
+### Magnetometer Support
+
+The ICM-20948 includes a built-in AK09916 magnetometer that is accessed through the optional sensor interface. This implementation uses:
+
+- **I2C Master Mode**: The ICM-20948's I2C master is configured to communicate with the AK09916
+- **I2C Slave Configuration**: Slave 0 is configured to automatically read magnetometer data
+- **EXT_SLV_SENS_DATA Registers**: Magnetometer data is accessed through these optional sensor data registers
+- **Automatic Data Reading**: Once configured, the ICM-20948 automatically reads magnetometer data at the configured rate
+
 ### Class: ICM20948
 
 Base class with common functionality.
@@ -127,6 +144,10 @@ Base class with common functionality.
 - `getAccel(std::array<float,3>&)`: Get all accelerometer values (in g)
 - `getGyro(std::array<float,3>&)`: Get all gyroscope values (in rad/s)
 - `getIMU(std::array<float,3>&, std::array<float,3>&)`: Get both accelerometer and gyroscope values
+- `initMagnetometer()`: Initialize the magnetometer (AK09916) using the optional sensor interface (returns true on success)
+- `readMagnetometer()`: Read raw magnetometer data via EXT_SLV_SENS_DATA registers
+- `getMagnetometer(AXSIS)`: Get magnetometer value for specific axis (in µT)
+- `getMagnetometer(std::array<float,3>&)`: Get all magnetometer values (in µT)
 
 ### Class: ICM20948_raspi (Raspberry Pi / Linux)
 

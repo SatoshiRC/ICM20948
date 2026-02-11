@@ -69,6 +69,11 @@ void ICM20948_raspi::__memRead(uint8_t memAddress, uint8_t *pData, uint8_t lengt
 	read(i2c_fd, pData, length);
 }
 
+void ICM20948_raspi::__memReadDma(uint8_t memAddress, uint8_t *pData, uint8_t length){
+	// For Raspberry Pi, DMA is not used, so we just call the regular read
+	__memRead(memAddress, pData, length);
+}
+
 void ICM20948_raspi::__delay(uint32_t ms){
 	usleep(ms * 1000);
 }

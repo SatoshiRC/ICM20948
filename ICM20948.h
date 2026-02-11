@@ -183,6 +183,35 @@ public:
 		Z,
 	};
 
+	// AK09916 Magnetometer constants
+	struct AK09916 {
+		static constexpr uint8_t I2C_ADDR = 0x0C;
+		
+		enum class REG: uint8_t {
+			WIA2 = 0x01,
+			ST1 = 0x10,
+			HXL = 0x11,
+			HXH = 0x12,
+			HYL = 0x13,
+			HYH = 0x14,
+			HZL = 0x15,
+			HZH = 0x16,
+			ST2 = 0x18,
+			CNTL2 = 0x31,
+			CNTL3 = 0x32,
+		};
+		
+		static constexpr uint8_t CNTL2_POWER_DOWN = 0x00;
+		static constexpr uint8_t CNTL2_SINGLE_MODE = 0x01;
+		static constexpr uint8_t CNTL2_CONT_MODE_10HZ = 0x02;
+		static constexpr uint8_t CNTL2_CONT_MODE_20HZ = 0x04;
+		static constexpr uint8_t CNTL2_CONT_MODE_50HZ = 0x06;
+		static constexpr uint8_t CNTL2_CONT_MODE_100HZ = 0x08;
+		static constexpr uint8_t CNTL3_RESET = 0x01;
+		
+		static constexpr uint8_t WIA2_VALUE = 0x09;
+	};
+
 	ICM20948(Address address)
 			:address(address){};
 
@@ -215,6 +244,12 @@ public:
 	void intPinConfig(uint8_t value);
 	void intenable1(uint8_t value=1);
 
+	// Magnetometer functions using optional sensor interface
+	bool initMagnetometer();
+	void readMagnetometer();
+	void getMagnetometer(std::array<float,3> &value);
+	float getMagnetometer(AXSIS axsis);
+
 	const uint8_t DISABLE_SENSORS=0x3F;
 	const uint8_t ENABLE_SENSORS=0x00;
 	const uint8_t BIT_H_RESET=0x80;
@@ -233,6 +268,9 @@ public:
 	const float GYRO_SENSITIVITY[4]={7509.643229221,3754.82161461,1877.410807305,938.705403653};
 //	const float GYRO_SENSITIVITY[4]={131.068,65.534,32.767,16.3835};
 
+	// Magnetometer sensitivity: 4912 / 32752 = 0.15 uT per LSB
+	const float MAG_SENSITIVITY = 0.15;
+
 protected:
 
 	const Address address;
@@ -248,12 +286,20 @@ private:
 	std::array<int16_t, 6> raw;
 	std::array<float,3> accel;
 	std::array<float,3> gyro;
+	std::array<int16_t, 3> rawMag;
+	std::array<float,3> mag;
 
 	bool requireCalcAccel = false;
 	bool requireCalcGyro = false;
+	bool requireCalcMag = false;
 
 	float calculateAccel(const int16_t raw);
 	float calculateGyro(const int16_t raw);
+	float calculateMag(const int16_t raw);
+	
+	// Helper methods for I2C master control
+	void writeMagRegister(uint8_t reg, uint8_t value);
+	uint8_t readMagRegister(uint8_t reg);
 };
 
 #endif /* INC_ICM20948_H_ */
