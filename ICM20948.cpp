@@ -178,23 +178,31 @@ float ICM20948::calculateMag(const int16_t raw){
 }
 
 void ICM20948::writeMagRegister(uint8_t reg, uint8_t value){
-	// Use I2C slave 4 for single register writes
-	memWrite(REGISTER::BANK3::I2C_SLV4_ADDR, AK09916::I2C_ADDR); // Write mode
-	memWrite(REGISTER::BANK3::I2C_SLV4_REG, reg);
-	memWrite(REGISTER::BANK3::I2C_SLV4_DO, value);
-	memWrite(REGISTER::BANK3::I2C_SLV4_CTRL, 0x80); // Enable I2C_SLV4 transaction
-	__delay(1);
+	// Use I2C slave 0 for single register writes
+	// Set slave 0 address to AK09916 in write mode
+	memWrite(REGISTER::BANK3::I2C_SLV0_ADDR, AK09916::I2C_ADDR);
+	// Set register address
+	memWrite(REGISTER::BANK3::I2C_SLV0_REG, reg);
+	// Set data to write
+	memWrite(REGISTER::BANK3::I2C_SLV0_DO, value);
+	// Enable I2C_SLV0 transaction: write 1 byte
+	memWrite(REGISTER::BANK3::I2C_SLV0_CTRL, 0x80 | 1);
+	__delay(10);
 }
 
 uint8_t ICM20948::readMagRegister(uint8_t reg){
-	// Use I2C slave 4 for single register reads
-	memWrite(REGISTER::BANK3::I2C_SLV4_ADDR, AK09916::I2C_ADDR | 0x80); // Read mode
-	memWrite(REGISTER::BANK3::I2C_SLV4_REG, reg);
-	memWrite(REGISTER::BANK3::I2C_SLV4_CTRL, 0x80); // Enable I2C_SLV4 transaction
-	__delay(1);
+	// Use I2C slave 0 for single register reads
+	// Set slave 0 address to AK09916 in read mode
+	memWrite(REGISTER::BANK3::I2C_SLV0_ADDR, AK09916::I2C_ADDR | 0x80);
+	// Set register address
+	memWrite(REGISTER::BANK3::I2C_SLV0_REG, reg);
+	// Enable I2C_SLV0 transaction: read 1 byte
+	memWrite(REGISTER::BANK3::I2C_SLV0_CTRL, 0x80 | 1);
+	__delay(10);
 	
+	// Read data from EXT_SLV_SENS_DATA_00
 	uint8_t data;
-	memRead(REGISTER::BANK3::I2C_SLV4_DI, &data);
+	memRead(REGISTER::BANK0::EXT_SLV_SENS_DATA_00, &data);
 	return data;
 }
 
