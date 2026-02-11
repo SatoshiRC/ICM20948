@@ -194,13 +194,14 @@ void ICM20948::processMagnetometerData(){
 
 bool ICM20948::initMagnetometer(){
 	// Enable I2C master mode
-	uint8_t userCtrl = 0x20; // I2C_MST_EN
+	uint8_t userCtrl = I2C_MST_EN;
 	memWrite(REGISTER::BANK0::USER_CTRL, &userCtrl);
 	
 	// Configure I2C master clock to 400kHz
-	uint8_t i2cMstCtrl = 0x07; // I2C_MST_CLK = 400kHz
+	uint8_t i2cMstCtrl = I2C_MST_CLK_400KHZ;
 	memWrite(REGISTER::BANK3::I2C_MST_CTRL, &i2cMstCtrl);
 	
+	// Wait for I2C master to be ready
 	__delay(10);
 	
 	// Reset AK09916
@@ -208,11 +209,12 @@ bool ICM20948::initMagnetometer(){
 	memWrite(REGISTER::BANK3::I2C_SLV0_ADDR, &ak09916Addr);
 	uint8_t ak09916Reg = AK09916_CNTL3;
 	memWrite(REGISTER::BANK3::I2C_SLV0_REG, &ak09916Reg);
-	uint8_t resetCmd = 0x01; // SRST
+	uint8_t resetCmd = AK09916_SRST;
 	memWrite(REGISTER::BANK3::I2C_SLV0_DO, &resetCmd);
-	uint8_t slv0Ctrl = 0x81; // Enable + 1 byte
+	uint8_t slv0Ctrl = I2C_SLV0_EN_1_BYTE;
 	memWrite(REGISTER::BANK3::I2C_SLV0_CTRL, &slv0Ctrl);
 	
+	// Wait for magnetometer reset to complete
 	__delay(10);
 	
 	// Set AK09916 to continuous measurement mode 4 (100Hz)
@@ -220,19 +222,20 @@ bool ICM20948::initMagnetometer(){
 	memWrite(REGISTER::BANK3::I2C_SLV0_ADDR, &ak09916Addr);
 	ak09916Reg = AK09916_CNTL2;
 	memWrite(REGISTER::BANK3::I2C_SLV0_REG, &ak09916Reg);
-	uint8_t modeCmd = 0x08; // Continuous mode 4 (100Hz)
+	uint8_t modeCmd = AK09916_MODE_CONTINUOUS_100HZ;
 	memWrite(REGISTER::BANK3::I2C_SLV0_DO, &modeCmd);
-	slv0Ctrl = 0x81; // Enable + 1 byte
+	slv0Ctrl = I2C_SLV0_EN_1_BYTE;
 	memWrite(REGISTER::BANK3::I2C_SLV0_CTRL, &slv0Ctrl);
 	
+	// Wait for mode change to take effect
 	__delay(10);
 	
 	// Configure SLV0 to read magnetometer data
-	ak09916Addr = AK09916_ADDRESS | 0x80; // Read mode
+	ak09916Addr = AK09916_ADDRESS | I2C_SLV_READ_FLAG;
 	memWrite(REGISTER::BANK3::I2C_SLV0_ADDR, &ak09916Addr);
 	ak09916Reg = AK09916_STATUS1;
 	memWrite(REGISTER::BANK3::I2C_SLV0_REG, &ak09916Reg);
-	slv0Ctrl = 0x88; // Enable + 8 bytes (ST1, HXL, HXH, HYL, HYH, HZL, HZH, ST2)
+	slv0Ctrl = I2C_SLV0_EN_8_BYTES; // ST1, HXL, HXH, HYL, HYH, HZL, HZH, ST2
 	memWrite(REGISTER::BANK3::I2C_SLV0_CTRL, &slv0Ctrl);
 	
 	return true;

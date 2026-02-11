@@ -239,6 +239,15 @@ public:
 	const uint8_t AK09916_CNTL3=0x32;
 	const uint8_t AK09916_DRDY_BIT=0x01;
 	const uint8_t AK09916_OVERFLOW_BIT=0x08;
+	const uint8_t AK09916_SRST=0x01;
+	const uint8_t AK09916_MODE_CONTINUOUS_100HZ=0x08;
+	
+	// I2C Master constants
+	const uint8_t I2C_MST_EN=0x20;
+	const uint8_t I2C_MST_CLK_400KHZ=0x07;
+	const uint8_t I2C_SLV_READ_FLAG=0x80;
+	const uint8_t I2C_SLV0_EN_1_BYTE=0x81;
+	const uint8_t I2C_SLV0_EN_8_BYTES=0x88;
 
 	void memWrite(REGISTER reg, uint8_t *pData, uint8_t length = 1);
 	void memWrite(REGISTER reg, uint8_t data){memWrite(reg,&data);}
