@@ -73,7 +73,7 @@ void ICM20948::readAccel(){
 }
 
 void ICM20948::readGyro(){
-	memRead(REGISTER::BANK0::GYRO_XOUT_H, (uint8_t*)&raw[3],6);
+	memRead(REGISTER::BANK0::GYRO_XOUT_H, (uint8_t*)&raw[6],6);
 	requireCalcGyro = true;
 }
 
@@ -92,7 +92,7 @@ void ICM20948::readIMU_DMA(){
 float ICM20948::getAccel(AXSIS axsis){
 	if(requireCalcAccel){
 		for(uint8_t n=0; n<3; n++){
-			accel[n] = calculateAccel(raw[n]);
+			accel[n] = calculateAccel(static_cast<int16_t>(static_cast<uint16_t>(raw[2*n]) << 8 | static_cast<uint16_t>(raw[2*n+1])));
 		}
 		requireCalcAccel = false;
 	}
@@ -103,7 +103,7 @@ float ICM20948::getAccel(AXSIS axsis){
 float ICM20948::getGyro(AXSIS axsis){
 	if(requireCalcGyro){
 		for(uint8_t n=0; n<3; n++){
-			gyro[n] = calculateGyro(raw[n+3]);
+			gyro[n] = calculateGyro(static_cast<int16_t>(static_cast<uint16_t>(raw[2*n+6]) << 8 | static_cast<uint16_t>(raw[2*n+1+6])));
 		}
 		requireCalcGyro = false;
 	}
@@ -114,7 +114,7 @@ float ICM20948::getGyro(AXSIS axsis){
 void ICM20948::getAccel(std::array<float,3> &value){
 	if(requireCalcAccel){
 		for(uint8_t n=0; n<3; n++){
-			accel[n] = calculateAccel(raw[n]);
+			accel[n] = calculateAccel(static_cast<int16_t>(static_cast<uint16_t>(raw[2*n]) << 8 | static_cast<uint16_t>(raw[2*n+1])));
 		}
 		requireCalcAccel = false;
 	}
@@ -125,7 +125,7 @@ void ICM20948::getAccel(std::array<float,3> &value){
 void ICM20948::getGyro(std::array<float,3> &value){
 	if(requireCalcGyro){
 		for(uint8_t n=0; n<3; n++){
-			gyro[n] = calculateGyro(raw[n+3]);
+			gyro[n] = calculateGyro(static_cast<int16_t>(static_cast<uint16_t>(raw[2*n+6]) << 8 | static_cast<uint16_t>(raw[2*n+1+6])));
 		}
 		requireCalcGyro = false;
 	}
