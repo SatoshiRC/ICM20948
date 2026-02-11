@@ -218,7 +218,7 @@ bool ICM20948::initMagnetometer(){
 	// Wait for magnetometer reset to complete
 	__delay(10);
 	
-	// Set AK09916 to continuous measurement mode 4 (100Hz)
+	// Set AK09916 to continuous measurement mode 4 (100Hz, register value 0x08)
 	ak09916Reg = AK09916_CNTL2;
 	memWrite(REGISTER::BANK3::I2C_SLV0_REG, &ak09916Reg);
 	uint8_t modeCmd = AK09916_MODE_CONTINUOUS_100HZ;
