@@ -185,6 +185,7 @@ void ICM20948::processMagnetometerData(){
 		if(!(mag_raw[7] & AK09916_OVERFLOW_BIT)){
 			// No overflow, calculate magnetic field
 			for(uint8_t n=0; n<3; n++){
+				// Combine low and high bytes (little-endian format)
 				int16_t raw_val = static_cast<int16_t>(static_cast<uint16_t>(mag_raw[2*n+1]) | (static_cast<uint16_t>(mag_raw[2*n+2]) << 8));
 				mag[n] = calculateMagnetometer(raw_val);
 			}
@@ -205,7 +206,7 @@ bool ICM20948::initMagnetometer(){
 	__delay(10);
 	
 	// Reset AK09916
-	uint8_t ak09916Addr = AK09916_ADDRESS; // Write mode
+	uint8_t ak09916Addr = AK09916_ADDRESS; // Write mode (R/W bit = 0)
 	memWrite(REGISTER::BANK3::I2C_SLV0_ADDR, &ak09916Addr);
 	uint8_t ak09916Reg = AK09916_CNTL3;
 	memWrite(REGISTER::BANK3::I2C_SLV0_REG, &ak09916Reg);
@@ -218,8 +219,6 @@ bool ICM20948::initMagnetometer(){
 	__delay(10);
 	
 	// Set AK09916 to continuous measurement mode 4 (100Hz)
-	ak09916Addr = AK09916_ADDRESS; // Write mode
-	memWrite(REGISTER::BANK3::I2C_SLV0_ADDR, &ak09916Addr);
 	ak09916Reg = AK09916_CNTL2;
 	memWrite(REGISTER::BANK3::I2C_SLV0_REG, &ak09916Reg);
 	uint8_t modeCmd = AK09916_MODE_CONTINUOUS_100HZ;
@@ -231,7 +230,7 @@ bool ICM20948::initMagnetometer(){
 	__delay(10);
 	
 	// Configure SLV0 to read magnetometer data
-	ak09916Addr = AK09916_ADDRESS | I2C_SLV_READ_FLAG;
+	ak09916Addr = AK09916_ADDRESS | I2C_SLV_READ_FLAG; // Read mode (R/W bit = 1)
 	memWrite(REGISTER::BANK3::I2C_SLV0_ADDR, &ak09916Addr);
 	ak09916Reg = AK09916_STATUS1;
 	memWrite(REGISTER::BANK3::I2C_SLV0_REG, &ak09916Reg);
