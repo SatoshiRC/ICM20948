@@ -195,6 +195,13 @@ public:
 	void readIMU();
 	void readImuDma();
 
+	//magnetometer methods
+	bool initMagnetometer();
+	void readMagnetometer();
+	void getMagnetometer(std::array<float,3> &value);
+	float getMagnetometer(AXSIS axsis);
+	std::array<int16_t, 3> getRawMagnetometer() const { return { mag_raw[0], mag_raw[1], mag_raw[2] }; }
+
 	//return the raw values array
 	std::array<int16_t, 3> getRawAccel() const { return { raw[0], raw[1], raw[2] }; }
 	std::array<int16_t, 3> getRawGyro()  const { return { raw[3], raw[4], raw[5] }; }
@@ -222,6 +229,15 @@ public:
 	const uint8_t BIT_INT_ACTL=0x80;
 	const uint8_t BIT_INT_OPEN=0x40;
 
+	// AK09916 Magnetometer constants
+	const uint8_t AK09916_ADDRESS=0x0C;
+	const uint8_t AK09916_WHO_AM_I=0x01;
+	const uint8_t AK09916_WHO_AM_I_RESPONSE=0x09;
+	const uint8_t AK09916_STATUS1=0x10;
+	const uint8_t AK09916_HXL=0x11;
+	const uint8_t AK09916_CNTL2=0x31;
+	const uint8_t AK09916_CNTL3=0x32;
+
 	void memWrite(REGISTER reg, uint8_t *pData, uint8_t length = 1);
 	void memWrite(REGISTER reg, uint8_t data){memWrite(reg,&data);}
 	void memRead(REGISTER reg, uint8_t *pData, uint8_t length = 1);
@@ -232,6 +248,9 @@ public:
 	//coefficient for conversion from raw value to radian per sec.
 	const float GYRO_SENSITIVITY[4]={7509.643229221,3754.82161461,1877.410807305,938.705403653};
 //	const float GYRO_SENSITIVITY[4]={131.068,65.534,32.767,16.3835};
+
+	//magnetometer sensitivity (0.15 µT/LSB)
+	const float MAG_SENSITIVITY=0.15;
 
 protected:
 
@@ -250,12 +269,16 @@ private:
 	std::array<uint8_t, 12> raw;
 	std::array<float,3> accel;
 	std::array<float,3> gyro;
+	std::array<uint8_t, 8> mag_raw;
+	std::array<float,3> mag;
 
 	bool requireCalcAccel = false;
 	bool requireCalcGyro = false;
+	bool requireCalcMag = false;
 
 	float calculateAccel(const int16_t raw);
 	float calculateGyro(const int16_t raw);
+	float calculateMagnetometer(const int16_t raw);
 };
 
 #endif /* INC_ICM20948_H_ */

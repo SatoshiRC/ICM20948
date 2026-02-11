@@ -51,11 +51,16 @@ A C++ library for the ICM-20948 9-axis motion tracking device (accelerometer, gy
    imu.accelConfig(ICM20948::AccelSensitivity::SENS_2G, true, 0);
    imu.gyroConfig(ICM20948::GyroSensitivity::SENS_250, true, 0);
    
+   // Initialize magnetometer
+   imu.initMagnetometer();
+   
    // Read data
    imu.readIMU();
-   std::array<float, 3> accel, gyro;
+   imu.readMagnetometer();
+   std::array<float, 3> accel, gyro, mag;
    imu.getAccel(accel);
    imu.getGyro(gyro);
+   imu.getMagnetometer(mag);
    
    // Clean up
    imu.end();
@@ -127,6 +132,10 @@ Base class with common functionality.
 - `getAccel(std::array<float,3>&)`: Get all accelerometer values (in g)
 - `getGyro(std::array<float,3>&)`: Get all gyroscope values (in rad/s)
 - `getIMU(std::array<float,3>&, std::array<float,3>&)`: Get both accelerometer and gyroscope values
+- `initMagnetometer()`: Initialize the AK09916 magnetometer via I2C master interface (SLV0)
+- `readMagnetometer()`: Read raw magnetometer data
+- `getMagnetometer(AXSIS)`: Get magnetometer value for specific axis (in µT)
+- `getMagnetometer(std::array<float,3>&)`: Get all magnetometer values (in µT)
 
 ### Class: ICM20948_raspi (Raspberry Pi / Linux)
 
