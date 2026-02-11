@@ -140,7 +140,7 @@ public:
 	void readAccel();
 	void readGyro();
 	void readIMU();
-	void readIMU_DMA();
+	void readImuDma();
 
 	//return the raw values array
 	std::array<int16_t, 3> getRawAccel() const { return { raw[0], raw[1], raw[2] }; }
