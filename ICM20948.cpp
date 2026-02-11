@@ -68,22 +68,23 @@ bool ICM20948::gyroConfig(const GyroSensitivity fssel,const bool enableDLPF,cons
 }
 
 void ICM20948::readAccel(){
-	memRead(REGISTER::BANK0::ACCEL_XOUT_H, (uint8_t*)rawAccel.data(),6);
+	memRead(REGISTER::BANK0::ACCEL_XOUT_H, (uint8_t*)raw.data(),6);
 	requireCalcAccel = true;
 }
 
 void ICM20948::readGyro(){
-	memRead(REGISTER::BANK0::GYRO_XOUT_H, (uint8_t*)rawGyro.data(),6);
+	memRead(REGISTER::BANK0::GYRO_XOUT_H, (uint8_t*)&raw[3],6);
 	requireCalcGyro = true;
 }
 
 void ICM20948::readIMU(){
-	uint8_t buf[12]={};
-	memRead(REGISTER::BANK0::ACCEL_XOUT_H, (uint8_t*)buf,12);
-	for(uint8_t n=0; n<3; n++){
-		rawAccel[n]=((int16_t)buf[2*n]<<8 | (int16_t)buf[2*n+1]);
-		rawGyro[n] = (int16_t)buf[2*n+6]<<8 | (int16_t)buf[2*n+1+6];
-	}
+	memRead(REGISTER::BANK0::ACCEL_XOUT_H, (uint8_t*)raw.data(),12);
+	requireCalcAccel = true;
+	requireCalcGyro = true;
+}
+
+void ICM20948::readIMU_DMA(){
+	memReadDma(REGISTER::BANK0::ACCEL_XOUT_H, (uint8_t*)raw.data(),12);
 	requireCalcAccel = true;
 	requireCalcGyro = true;
 }
@@ -91,7 +92,7 @@ void ICM20948::readIMU(){
 float ICM20948::getAccel(AXSIS axsis){
 	if(requireCalcAccel){
 		for(uint8_t n=0; n<3; n++){
-			accel[n] = calculateAccel(rawAccel[n]);
+			accel[n] = calculateAccel(raw[n]);
 		}
 		requireCalcAccel = false;
 	}
@@ -102,7 +103,7 @@ float ICM20948::getAccel(AXSIS axsis){
 float ICM20948::getGyro(AXSIS axsis){
 	if(requireCalcGyro){
 		for(uint8_t n=0; n<3; n++){
-			gyro[n] = calculateGyro(rawGyro[n]);
+			gyro[n] = calculateGyro(raw[n+3]);
 		}
 		requireCalcGyro = false;
 	}
@@ -113,7 +114,7 @@ float ICM20948::getGyro(AXSIS axsis){
 void ICM20948::getAccel(std::array<float,3> &value){
 	if(requireCalcAccel){
 		for(uint8_t n=0; n<3; n++){
-			accel[n] = calculateAccel(rawAccel[n]);
+			accel[n] = calculateAccel(raw[n]);
 		}
 		requireCalcAccel = false;
 	}
@@ -124,7 +125,7 @@ void ICM20948::getAccel(std::array<float,3> &value){
 void ICM20948::getGyro(std::array<float,3> &value){
 	if(requireCalcGyro){
 		for(uint8_t n=0; n<3; n++){
-			gyro[n] = calculateGyro(rawGyro[n]);
+			gyro[n] = calculateGyro(raw[n+3]);
 		}
 		requireCalcGyro = false;
 	}
@@ -155,6 +156,13 @@ void ICM20948::memRead(REGISTER reg, uint8_t *pData, uint8_t length){
 		changeUserBank(reg.bank);
 	}
 	__memRead(reg.address, pData, length);
+}
+
+void ICM20948::memReadDma(REGISTER reg, uint8_t *pData, uint8_t length){
+	if(this->currentBank != reg.bank){
+		changeUserBank(reg.bank);
+	}
+	__memReadDma(reg.address, pData, length);
 }
 
 float ICM20948::calculateAccel(const int16_t raw){

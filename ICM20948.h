@@ -140,10 +140,11 @@ public:
 	void readAccel();
 	void readGyro();
 	void readIMU();
+	void readIMU_DMA();
 
 	//return the raw values array
-	std::array<int16_t, 3> getRawAccel(){return rawAccel;}
-	std::array<int16_t, 3> getRawGyro(){return rawGyro;}
+//	std::array<int16_t, 3> getRawAccel(){return rawAccel;}
+//	std::array<int16_t, 3> getRawGyro(){return rawGyro;}
 
 	//calculate acceles and angular or one of them velosity from raw values array and return the result.
 	float getAccel(AXSIS axsis);
@@ -171,6 +172,7 @@ public:
 	void memWrite(REGISTER reg, uint8_t *pData, uint8_t length = 1);
 	void memWrite(REGISTER reg, uint8_t data){memWrite(reg,&data);}
 	void memRead(REGISTER reg, uint8_t *pData, uint8_t length = 1);
+	void memReadDma(REGISTER reg, uint8_t *pData, uint8_t length = 1);
 
 	const float ACCEL_SENSITIVITY[4]={16384,8192,4096,2048};
 
@@ -187,10 +189,10 @@ protected:
 private:
 	virtual void __memWrite(uint8_t memAddress, uint8_t *pData, uint8_t length=1)=0;
 	virtual void __memRead(uint8_t memAddress, uint8_t *pData, uint8_t length=1)=0;
+	virtual void __memReadDma(uint8_t memAddress, uint8_t *pData, uint8_t length=1)=0;
 	virtual void __delay(uint32_t ms)=0;
 
-	std::array<int16_t,3> rawAccel;
-	std::array<int16_t,3> rawGyro;
+	std::array<int16_t, 6> raw;
 	std::array<float,3> accel;
 	std::array<float,3> gyro;
 
