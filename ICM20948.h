@@ -140,9 +140,9 @@ public:
 	// NOTE: ICM20948 registers store data in big-endian format (MSB first).
 	// Both Raspberry Pi (ARM Cortex-A) and STM32 (ARM Cortex-M) typically operate in
 	// little-endian mode by default. The current implementation reads directly into
-	// int16_t arrays, which may cause byte-order issues on little-endian systems.
-	// Consider reading into uint8_t buffers first and then manually combining bytes
-	// for proper endianness handling.
+	// int16_t arrays, which WILL cause byte-order issues on little-endian systems,
+	// resulting in incorrect sensor values. To fix this, read into uint8_t buffers
+	// first and then manually combine bytes: ((MSB << 8) | LSB).
 	void readAccel();
 	void readGyro();
 	void readIMU();
