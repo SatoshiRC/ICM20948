@@ -138,10 +138,11 @@ public:
 
 	// Read IMU output registers and store into raw values array
 	// NOTE: ICM20948 registers store data in big-endian format (MSB first).
-	// Both Raspberry Pi (ARM Cortex-A) and STM32 (ARM Cortex-M) are little-endian systems.
-	// The current implementation reads directly into int16_t arrays, which may cause
-	// byte-order issues on little-endian systems. Consider reading into uint8_t buffers
-	// first and then manually combining bytes for proper endianness handling.
+	// Both Raspberry Pi (ARM Cortex-A) and STM32 (ARM Cortex-M) typically operate in
+	// little-endian mode by default. The current implementation reads directly into
+	// int16_t arrays, which may cause byte-order issues on little-endian systems.
+	// Consider reading into uint8_t buffers first and then manually combining bytes
+	// for proper endianness handling.
 	void readAccel();
 	void readGyro();
 	void readIMU();
