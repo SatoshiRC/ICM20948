@@ -21,4 +21,7 @@ void ICM20948_HAL::__delay(uint32_t ms){
 	HAL_Delay(ms);
 }
 
+void ICM20948_HAL::__memReadDma(uint8_t memAddress, uint8_t *pData, uint8_t length){
+	HAL_I2C_Mem_Read_DMA(hi2c, (uint16_t)address<<1, memAddress, 1, pData, length);
+}
 #endif /*USE_HAL_DRIVER*/

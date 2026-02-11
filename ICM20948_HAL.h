@@ -27,6 +27,7 @@ private:
 
 	void __memWrite(uint8_t memAddress, uint8_t *pData, uint8_t length=1);
 	void __memRead(uint8_t memAddress, uint8_t *pData, uint8_t length=1);
+	void __memReadDma(uint8_t memAddress, uint8_t *pData, uint8_t length=1);
 	void __delay(uint32_t ms);
 };
 
