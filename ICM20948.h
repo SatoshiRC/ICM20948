@@ -59,6 +59,30 @@ public:
 			GYRO_ZOUT_L,
 			TEMP_OUT_H = 57,
 			TEMP_OUT_L,
+			EXT_SLV_SENS_DATA_00 = 59,
+			EXT_SLV_SENS_DATA_01,
+			EXT_SLV_SENS_DATA_02,
+			EXT_SLV_SENS_DATA_03,
+			EXT_SLV_SENS_DATA_04,
+			EXT_SLV_SENS_DATA_05,
+			EXT_SLV_SENS_DATA_06,
+			EXT_SLV_SENS_DATA_07,
+			EXT_SLV_SENS_DATA_08,
+			EXT_SLV_SENS_DATA_09,
+			EXT_SLV_SENS_DATA_10,
+			EXT_SLV_SENS_DATA_11,
+			EXT_SLV_SENS_DATA_12,
+			EXT_SLV_SENS_DATA_13,
+			EXT_SLV_SENS_DATA_14,
+			EXT_SLV_SENS_DATA_15,
+			EXT_SLV_SENS_DATA_16,
+			EXT_SLV_SENS_DATA_17,
+			EXT_SLV_SENS_DATA_18,
+			EXT_SLV_SENS_DATA_19,
+			EXT_SLV_SENS_DATA_20,
+			EXT_SLV_SENS_DATA_21,
+			EXT_SLV_SENS_DATA_22,
+			EXT_SLV_SENS_DATA_23,
 			DATA_RDY_STATUS = 116,
 			REG_BANK_SEL = 127,
 		};
@@ -103,6 +127,34 @@ public:
 			REG_BANK_SEL = 127,
 		};
 		
+		enum class BANK3:uint8_t{
+			I2C_MST_ODR_CONFIG = 0,
+			I2C_MST_CTRL,
+			I2C_MST_DELAY_CTRL,
+			I2C_SLV0_ADDR = 3,
+			I2C_SLV0_REG,
+			I2C_SLV0_CTRL,
+			I2C_SLV0_DO,
+			I2C_SLV1_ADDR = 7,
+			I2C_SLV1_REG,
+			I2C_SLV1_CTRL,
+			I2C_SLV1_DO,
+			I2C_SLV2_ADDR = 11,
+			I2C_SLV2_REG,
+			I2C_SLV2_CTRL,
+			I2C_SLV2_DO,
+			I2C_SLV3_ADDR = 15,
+			I2C_SLV3_REG,
+			I2C_SLV3_CTRL,
+			I2C_SLV3_DO,
+			I2C_SLV4_ADDR = 19,
+			I2C_SLV4_REG,
+			I2C_SLV4_CTRL,
+			I2C_SLV4_DO,
+			I2C_SLV4_DI,
+			REG_BANK_SEL = 127,
+		};
+
 		enum class BANK{
 			BANK0,
 			BANK1,
@@ -114,6 +166,7 @@ public:
 	    REGISTER(BANK0 arg):bank(BANK::BANK0),address((uint8_t)arg){}
 	    REGISTER(BANK1 arg):bank(BANK::BANK1),address((uint8_t)arg){}
 	    REGISTER(BANK2 arg):bank(BANK::BANK2),address((uint8_t)arg){}
+	    REGISTER(BANK3 arg):bank(BANK::BANK3),address((uint8_t)arg){}
 
 	    BANK bank;
 	    uint8_t address;
