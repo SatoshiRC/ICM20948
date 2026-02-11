@@ -1,0 +1,18 @@
+# Object files
+*.o
+*.obj
+
+# Executable files
+example
+example_raspi
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build directories
+build/
+bin/

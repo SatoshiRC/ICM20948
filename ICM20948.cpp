@@ -24,7 +24,7 @@ void ICM20948::pwrmgmt2(uint8_t data){
 void ICM20948::reset(){
 	uint8_t n=0b1<<7;
 	memWrite(REGISTER::BANK0::PWR_MGMT_1, &n);
-	HAL_Delay(10);
+	__delay(10);
 }
 
 bool ICM20948::changeUserBank(REGISTER::BANK bank){

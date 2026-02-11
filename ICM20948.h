@@ -8,7 +8,7 @@
 #ifndef INC_ICM20948_H_
 #define INC_ICM20948_H_
 
-#include"i2c.h"
+#include <stdint.h>
 #include <array>
 
 class ICM20948 {
@@ -187,6 +187,7 @@ protected:
 private:
 	virtual void __memWrite(uint8_t memAddress, uint8_t *pData, uint8_t length=1)=0;
 	virtual void __memRead(uint8_t memAddress, uint8_t *pData, uint8_t length=1)=0;
+	virtual void __delay(uint32_t ms)=0;
 
 	std::array<int16_t,3> rawAccel;
 	std::array<int16_t,3> rawGyro;
