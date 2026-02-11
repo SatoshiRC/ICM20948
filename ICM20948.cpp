@@ -83,7 +83,7 @@ void ICM20948::readIMU(){
 	requireCalcGyro = true;
 }
 
-void ICM20948::readIMU_DMA(){
+void ICM20948::readImuDma(){
 	memReadDma(REGISTER::BANK0::ACCEL_XOUT_H, (uint8_t*)raw.data(),12);
 	requireCalcAccel = true;
 	requireCalcGyro = true;
