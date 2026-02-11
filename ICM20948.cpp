@@ -187,7 +187,7 @@ void ICM20948::writeMagRegister(uint8_t reg, uint8_t value){
 	memWrite(REGISTER::BANK3::I2C_SLV0_DO, value);
 	// Enable I2C_SLV0 transaction: write 1 byte
 	memWrite(REGISTER::BANK3::I2C_SLV0_CTRL, 0x80 | 1);
-	__delay(10);
+	__delay(2);
 }
 
 uint8_t ICM20948::readMagRegister(uint8_t reg){
@@ -198,7 +198,7 @@ uint8_t ICM20948::readMagRegister(uint8_t reg){
 	memWrite(REGISTER::BANK3::I2C_SLV0_REG, reg);
 	// Enable I2C_SLV0 transaction: read 1 byte
 	memWrite(REGISTER::BANK3::I2C_SLV0_CTRL, 0x80 | 1);
-	__delay(10);
+	__delay(2);
 	
 	// Read data from EXT_SLV_SENS_DATA_00
 	uint8_t data;
