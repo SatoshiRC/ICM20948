@@ -177,6 +177,21 @@ float ICM20948::calculateMagnetometer(const int16_t raw){
 	return raw * MAG_SENSITIVITY;
 }
 
+void ICM20948::processMagnetometerData(){
+	// Check ST1 register bit 0 (DRDY)
+	if(mag_raw[0] & AK09916_DRDY_BIT){
+		// Data is ready, process it
+		// ST2 register is at mag_raw[7], check for overflow
+		if(!(mag_raw[7] & AK09916_OVERFLOW_BIT)){
+			// No overflow, calculate magnetic field
+			for(uint8_t n=0; n<3; n++){
+				int16_t raw_val = static_cast<int16_t>(static_cast<uint16_t>(mag_raw[2*n+1]) | (static_cast<uint16_t>(mag_raw[2*n+2]) << 8));
+				mag[n] = calculateMagnetometer(raw_val);
+			}
+		}
+	}
+}
+
 bool ICM20948::initMagnetometer(){
 	// Enable I2C master mode
 	uint8_t userCtrl = 0x20; // I2C_MST_EN
@@ -230,18 +245,7 @@ void ICM20948::readMagnetometer(){
 
 void ICM20948::getMagnetometer(std::array<float,3> &value){
 	if(requireCalcMag){
-		// Check ST1 register bit 0 (DRDY)
-		if(mag_raw[0] & 0x01){
-			// Data is ready, process it
-			// ST2 register is at mag_raw[7], check for overflow
-			if(!(mag_raw[7] & 0x08)){
-				// No overflow, calculate magnetic field
-				for(uint8_t n=0; n<3; n++){
-					int16_t raw_val = static_cast<int16_t>(static_cast<uint16_t>(mag_raw[2*n+1]) | (static_cast<uint16_t>(mag_raw[2*n+2]) << 8));
-					mag[n] = calculateMagnetometer(raw_val);
-				}
-			}
-		}
+		processMagnetometerData();
 		requireCalcMag = false;
 	}
 	value = mag;
@@ -249,18 +253,7 @@ void ICM20948::getMagnetometer(std::array<float,3> &value){
 
 float ICM20948::getMagnetometer(AXSIS axsis){
 	if(requireCalcMag){
-		// Check ST1 register bit 0 (DRDY)
-		if(mag_raw[0] & 0x01){
-			// Data is ready, process it
-			// ST2 register is at mag_raw[7], check for overflow
-			if(!(mag_raw[7] & 0x08)){
-				// No overflow, calculate magnetic field
-				for(uint8_t n=0; n<3; n++){
-					int16_t raw_val = static_cast<int16_t>(static_cast<uint16_t>(mag_raw[2*n+1]) | (static_cast<uint16_t>(mag_raw[2*n+2]) << 8));
-					mag[n] = calculateMagnetometer(raw_val);
-				}
-			}
-		}
+		processMagnetometerData();
 		requireCalcMag = false;
 	}
 	return mag[(uint8_t)axsis];

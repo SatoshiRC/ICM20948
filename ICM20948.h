@@ -237,6 +237,8 @@ public:
 	const uint8_t AK09916_HXL=0x11;
 	const uint8_t AK09916_CNTL2=0x31;
 	const uint8_t AK09916_CNTL3=0x32;
+	const uint8_t AK09916_DRDY_BIT=0x01;
+	const uint8_t AK09916_OVERFLOW_BIT=0x08;
 
 	void memWrite(REGISTER reg, uint8_t *pData, uint8_t length = 1);
 	void memWrite(REGISTER reg, uint8_t data){memWrite(reg,&data);}
@@ -279,6 +281,7 @@ private:
 	float calculateAccel(const int16_t raw);
 	float calculateGyro(const int16_t raw);
 	float calculateMagnetometer(const int16_t raw);
+	void processMagnetometerData();
 };
 
 #endif /* INC_ICM20948_H_ */
