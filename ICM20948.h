@@ -28,6 +28,16 @@ public:
 		SENS_2000,
 	};
 
+	enum class MagnetometerMode: uint8_t{
+		PowerDown = 0,
+		SingleMeasurement,
+		ContinuesMeasurement_10Hz = 2,
+		ContinuesMeasurement_20Hz = 4,
+		ContinuesMeasurement_50Hz = 6,
+		ContinuesMeasurement_1000Hz = 8,
+		SelfTest = 16,
+	};
+
 	struct REGISTER{
 		enum class BANK0: uint8_t{
 			WHO_AM_I = 0,
@@ -196,7 +206,8 @@ public:
 	void readImuDma();
 
 	//magnetometer methods
-	bool initMagnetometer();
+	bool initMagnetometer(MagnetometerMode mode = MagnetometerMode::ContinuesMeasurement_1000Hz);
+	void setMagnetometerMode(MagnetometerMode mode = MagnetometerMode::ContinuesMeasurement_1000Hz);
 	void readMagnetometer();
 	void getMagnetometer(std::array<float,3> &value);
 	float getMagnetometer(AXSIS axsis);

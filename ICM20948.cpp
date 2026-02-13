@@ -193,7 +193,7 @@ void ICM20948::processMagnetometerData(){
 	}
 }
 
-bool ICM20948::initMagnetometer(){
+bool ICM20948::initMagnetometer(MagnetometerMode mode){
 	// Enable I2C master mode
 	uint8_t userCtrl = I2C_MST_EN;
 	memWrite(REGISTER::BANK0::USER_CTRL, &userCtrl);
@@ -219,15 +219,7 @@ bool ICM20948::initMagnetometer(){
 	__delay(10);
 	
 	// Set AK09916 to continuous measurement mode 4 (100Hz, register value 0x08)
-	ak09916Reg = AK09916_CNTL2;
-	memWrite(REGISTER::BANK3::I2C_SLV0_REG, &ak09916Reg);
-	uint8_t modeCmd = AK09916_MODE_CONTINUOUS_100HZ;
-	memWrite(REGISTER::BANK3::I2C_SLV0_DO, &modeCmd);
-	slv0Ctrl = I2C_SLV0_EN_1_BYTE;
-	memWrite(REGISTER::BANK3::I2C_SLV0_CTRL, &slv0Ctrl);
-	
-	// Wait for mode change to take effect
-	__delay(10);
+	setMagnetometerMode(mode);
 	
 	// Configure SLV0 to read magnetometer data
 	ak09916Addr = AK09916_ADDRESS | I2C_SLV_READ_FLAG; // Read mode (R/W bit = 1)
@@ -238,6 +230,18 @@ bool ICM20948::initMagnetometer(){
 	memWrite(REGISTER::BANK3::I2C_SLV0_CTRL, &slv0Ctrl);
 	
 	return true;
+}
+
+void ICM20948::setMagnetometerMode(MagnetometerMode mode){
+	uint8_t ak09916Reg = AK09916_CNTL2;
+	memWrite(REGISTER::BANK3::I2C_SLV0_REG, &ak09916Reg);
+	uint8_t modeCmd = AK09916_MODE_CONTINUOUS_100HZ;
+	memWrite(REGISTER::BANK3::I2C_SLV0_DO, &modeCmd);
+	uint8_t slv0Ctrl = I2C_SLV0_EN_1_BYTE;
+	memWrite(REGISTER::BANK3::I2C_SLV0_CTRL, &slv0Ctrl);
+	
+	// Wait for mode change to take effect
+	__delay(10);
 }
 
 void ICM20948::readMagnetometer(){
