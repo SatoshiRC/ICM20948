@@ -78,15 +78,17 @@ void ICM20948::readGyro(){
 }
 
 void ICM20948::readIMU(){
-	memRead(REGISTER::BANK0::ACCEL_XOUT_H, (uint8_t*)raw.data(),12);
+	memRead(REGISTER::BANK0::ACCEL_XOUT_H, (uint8_t*)raw.data(),22);
 	requireCalcAccel = true;
 	requireCalcGyro = true;
+	requireCalcMag = true;
 }
 
 void ICM20948::readImuDma(){
-	memReadDma(REGISTER::BANK0::ACCEL_XOUT_H, (uint8_t*)raw.data(),12);
+	memReadDma(REGISTER::BANK0::ACCEL_XOUT_H, (uint8_t*)raw.data(),22);
 	requireCalcAccel = true;
 	requireCalcGyro = true;
+	requireCalcMag = true;
 }
 
 float ICM20948::getAccel(AXSIS axsis){
@@ -179,6 +181,7 @@ float ICM20948::calculateMagnetometer(const int16_t raw){
 
 void ICM20948::processMagnetometerData(){
 	// Check ST1 register bit 0 (DRDY)
+	std::copy(raw.data()+14, raw.end(), mag_raw.data());
 	if(mag_raw[0] & AK09916_DRDY_BIT){
 		// Data is ready, process it
 		// ST2 register is at mag_raw[7], check for overflow
@@ -245,7 +248,7 @@ void ICM20948::setMagnetometerMode(MagnetometerMode mode){
 }
 
 void ICM20948::readMagnetometer(){
-	memRead(REGISTER::BANK0::EXT_SLV_SENS_DATA_00, (uint8_t*)mag_raw.data(), 8);
+	memRead(REGISTER::BANK0::EXT_SLV_SENS_DATA_00, (uint8_t*)raw.data() + 14, 8);
 	requireCalcMag = true;
 }
 

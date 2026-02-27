@@ -288,7 +288,7 @@ private:
 	}
 	virtual void __delay(uint32_t ms)=0;
 
-	std::array<uint8_t, 12> raw;
+	std::array<uint8_t, 22> raw;
 	std::array<float,3> accel;
 	std::array<float,3> gyro;
 	std::array<uint8_t, 8> mag_raw;
