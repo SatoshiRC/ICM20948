@@ -46,12 +46,21 @@ int main() {
 	// Configure gyroscope: ±250dps, DLPF enabled, config 0
 	imu.gyroConfig(ICM20948::GyroSensitivity::SENS_250, true, 0);
 	
+	// Initialize magnetometer
+	if (!imu.initMagnetometer()) {
+		std::cerr << "Failed to initialize magnetometer" << std::endl;
+		return 1;
+	}
+	
 	std::cout << "ICM20948 initialized successfully" << std::endl;
 	
 	// Read and display sensor data
 	for (int i = 0; i < 10; i++) {
 		// Read IMU data (both accelerometer and gyroscope)
 		imu.readIMU();
+		
+		// Read magnetometer data
+		imu.readMagnetometer();
 		
 		// Get processed accelerometer data in g
 		std::array<float, 3> accel;
@@ -61,6 +70,10 @@ int main() {
 		std::array<float, 3> gyro;
 		imu.getGyro(gyro);
 		
+		// Get processed magnetometer data in µT
+		std::array<float, 3> mag;
+		imu.getMagnetometer(mag);
+		
 		std::cout << "Accel (g): "
 		          << "X=" << accel[0] << " "
 		          << "Y=" << accel[1] << " "
@@ -69,7 +82,12 @@ int main() {
 		std::cout << "Gyro (rad/s): "
 		          << "X=" << gyro[0] << " "
 		          << "Y=" << gyro[1] << " "
-		          << "Z=" << gyro[2] << std::endl;
+		          << "Z=" << gyro[2] << " | ";
+		
+		std::cout << "Mag (µT): "
+		          << "X=" << mag[0] << " "
+		          << "Y=" << mag[1] << " "
+		          << "Z=" << mag[2] << std::endl;
 		
 		usleep(100000); // Wait 100ms between readings
 	}

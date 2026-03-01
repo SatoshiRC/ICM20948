@@ -28,6 +28,16 @@ public:
 		SENS_2000,
 	};
 
+	enum class MagnetometerMode: uint8_t{
+		PowerDown = 0,
+		SingleMeasurement,
+		ContinuesMeasurement_10Hz = 2,
+		ContinuesMeasurement_20Hz = 4,
+		ContinuesMeasurement_50Hz = 6,
+		ContinuesMeasurement_1000Hz = 8,
+		SelfTest = 16,
+	};
+
 	struct REGISTER{
 		enum class BANK0: uint8_t{
 			WHO_AM_I = 0,
@@ -59,6 +69,30 @@ public:
 			GYRO_ZOUT_L,
 			TEMP_OUT_H = 57,
 			TEMP_OUT_L,
+			EXT_SLV_SENS_DATA_00 = 59,
+			EXT_SLV_SENS_DATA_01,
+			EXT_SLV_SENS_DATA_02,
+			EXT_SLV_SENS_DATA_03,
+			EXT_SLV_SENS_DATA_04,
+			EXT_SLV_SENS_DATA_05,
+			EXT_SLV_SENS_DATA_06,
+			EXT_SLV_SENS_DATA_07,
+			EXT_SLV_SENS_DATA_08,
+			EXT_SLV_SENS_DATA_09,
+			EXT_SLV_SENS_DATA_10,
+			EXT_SLV_SENS_DATA_11,
+			EXT_SLV_SENS_DATA_12,
+			EXT_SLV_SENS_DATA_13,
+			EXT_SLV_SENS_DATA_14,
+			EXT_SLV_SENS_DATA_15,
+			EXT_SLV_SENS_DATA_16,
+			EXT_SLV_SENS_DATA_17,
+			EXT_SLV_SENS_DATA_18,
+			EXT_SLV_SENS_DATA_19,
+			EXT_SLV_SENS_DATA_20,
+			EXT_SLV_SENS_DATA_21,
+			EXT_SLV_SENS_DATA_22,
+			EXT_SLV_SENS_DATA_23,
 			DATA_RDY_STATUS = 116,
 			REG_BANK_SEL = 127,
 		};
@@ -103,6 +137,34 @@ public:
 			REG_BANK_SEL = 127,
 		};
 		
+		enum class BANK3:uint8_t{
+			I2C_MST_ODR_CONFIG = 0,
+			I2C_MST_CTRL,
+			I2C_MST_DELAY_CTRL,
+			I2C_SLV0_ADDR = 3,
+			I2C_SLV0_REG,
+			I2C_SLV0_CTRL,
+			I2C_SLV0_DO,
+			I2C_SLV1_ADDR = 7,
+			I2C_SLV1_REG,
+			I2C_SLV1_CTRL,
+			I2C_SLV1_DO,
+			I2C_SLV2_ADDR = 11,
+			I2C_SLV2_REG,
+			I2C_SLV2_CTRL,
+			I2C_SLV2_DO,
+			I2C_SLV3_ADDR = 15,
+			I2C_SLV3_REG,
+			I2C_SLV3_CTRL,
+			I2C_SLV3_DO,
+			I2C_SLV4_ADDR = 19,
+			I2C_SLV4_REG,
+			I2C_SLV4_CTRL,
+			I2C_SLV4_DO,
+			I2C_SLV4_DI,
+			REG_BANK_SEL = 127,
+		};
+
 		enum class BANK{
 			BANK0,
 			BANK1,
@@ -114,6 +176,7 @@ public:
 	    REGISTER(BANK0 arg):bank(BANK::BANK0),address((uint8_t)arg){}
 	    REGISTER(BANK1 arg):bank(BANK::BANK1),address((uint8_t)arg){}
 	    REGISTER(BANK2 arg):bank(BANK::BANK2),address((uint8_t)arg){}
+	    REGISTER(BANK3 arg):bank(BANK::BANK3),address((uint8_t)arg){}
 
 	    BANK bank;
 	    uint8_t address;
@@ -142,6 +205,14 @@ public:
 	void readIMU();
 	void readImuDma();
 
+	//magnetometer methods
+	bool initMagnetometer(MagnetometerMode mode = MagnetometerMode::ContinuesMeasurement_1000Hz);
+	void setMagnetometerMode(MagnetometerMode mode = MagnetometerMode::ContinuesMeasurement_1000Hz);
+	void readMagnetometer();
+	void getMagnetometer(std::array<float,3> &value);
+	float getMagnetometer(AXSIS axsis);
+	std::array<int16_t, 3> getRawMagnetometer() const { return magRaw; }
+
 	//return the raw values array
 	std::array<int16_t, 3> getRawAccel() const { return { raw[0], raw[1], raw[2] }; }
 	std::array<int16_t, 3> getRawGyro()  const { return { raw[3], raw[4], raw[5] }; }
@@ -169,6 +240,26 @@ public:
 	const uint8_t BIT_INT_ACTL=0x80;
 	const uint8_t BIT_INT_OPEN=0x40;
 
+	// AK09916 Magnetometer constants
+	const uint8_t AK09916_ADDRESS=0x0C;
+	const uint8_t AK09916_WHO_AM_I=0x01;
+	const uint8_t AK09916_WHO_AM_I_RESPONSE=0x09;
+	const uint8_t AK09916_STATUS1=0x10;
+	const uint8_t AK09916_HXL=0x11;
+	const uint8_t AK09916_CNTL2=0x31;
+	const uint8_t AK09916_CNTL3=0x32;
+	const uint8_t AK09916_DRDY_BIT=0x01;
+	const uint8_t AK09916_OVERFLOW_BIT=0x08;
+	const uint8_t AK09916_SRST=0x01;
+	const uint8_t AK09916_MODE_CONTINUOUS_100HZ=0x08;
+	
+	// I2C Master constants
+	const uint8_t I2C_MST_EN=0x20;
+	const uint8_t I2C_MST_CLK_400KHZ=0x07;
+	const uint8_t I2C_SLV_READ_FLAG=0x80;
+	const uint8_t I2C_SLV0_EN_1_BYTE=0x81;
+	const uint8_t I2C_SLV0_EN_8_BYTES=0x89;
+
 	void memWrite(REGISTER reg, uint8_t *pData, uint8_t length = 1);
 	void memWrite(REGISTER reg, uint8_t data){memWrite(reg,&data);}
 	void memRead(REGISTER reg, uint8_t *pData, uint8_t length = 1);
@@ -179,6 +270,9 @@ public:
 	//coefficient for conversion from raw value to radian per sec.
 	const float GYRO_SENSITIVITY[4]={7509.643229221,3754.82161461,1877.410807305,938.705403653};
 //	const float GYRO_SENSITIVITY[4]={131.068,65.534,32.767,16.3835};
+
+	//magnetometer sensitivity (0.15 µT/LSB)
+	const float MAG_SENSITIVITY=0.15;
 
 protected:
 
@@ -194,15 +288,22 @@ private:
 	}
 	virtual void __delay(uint32_t ms)=0;
 
-	std::array<uint8_t, 12> raw;
+	std::array<uint8_t, 23> raw;
 	std::array<float,3> accel;
 	std::array<float,3> gyro;
+	std::array<float,3> mag;
+	std::array<int16_t, 3> magRaw;
+	std::array<int16_t, 3> accelRaw;
+	std::array<int16_t, 3> gyroRaw;
 
 	bool requireCalcAccel = false;
 	bool requireCalcGyro = false;
+	bool requireCalcMag = false;
 
 	float calculateAccel(const int16_t raw);
 	float calculateGyro(const int16_t raw);
+	float calculateMagnetometer(const int16_t raw);
+	void processMagnetometerData();
 };
 
 #endif /* INC_ICM20948_H_ */
