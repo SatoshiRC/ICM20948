@@ -211,7 +211,7 @@ public:
 	void readMagnetometer();
 	void getMagnetometer(std::array<float,3> &value);
 	float getMagnetometer(AXSIS axsis);
-	std::array<int16_t, 3> getRawMagnetometer() const { return { mag_raw[0], mag_raw[1], mag_raw[2] }; }
+	std::array<int16_t, 3> getRawMagnetometer() const { return magRaw; }
 
 	//return the raw values array
 	std::array<int16_t, 3> getRawAccel() const { return { raw[0], raw[1], raw[2] }; }
@@ -258,7 +258,7 @@ public:
 	const uint8_t I2C_MST_CLK_400KHZ=0x07;
 	const uint8_t I2C_SLV_READ_FLAG=0x80;
 	const uint8_t I2C_SLV0_EN_1_BYTE=0x81;
-	const uint8_t I2C_SLV0_EN_8_BYTES=0x88;
+	const uint8_t I2C_SLV0_EN_8_BYTES=0x89;
 
 	void memWrite(REGISTER reg, uint8_t *pData, uint8_t length = 1);
 	void memWrite(REGISTER reg, uint8_t data){memWrite(reg,&data);}
@@ -288,11 +288,13 @@ private:
 	}
 	virtual void __delay(uint32_t ms)=0;
 
-	std::array<uint8_t, 22> raw;
+	std::array<uint8_t, 23> raw;
 	std::array<float,3> accel;
 	std::array<float,3> gyro;
-	std::array<uint8_t, 8> mag_raw;
 	std::array<float,3> mag;
+	std::array<int16_t, 3> magRaw;
+	std::array<int16_t, 3> accelRaw;
+	std::array<int16_t, 3> gyroRaw;
 
 	bool requireCalcAccel = false;
 	bool requireCalcGyro = false;
